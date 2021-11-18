@@ -8,14 +8,17 @@ import {
   Post,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import PostsService from './posts.service';
 import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
 import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
 import FindOneParams from 'src/utils/findOneParams';
+import { ExcludeNullInterceptor } from 'src/utils/excludeNull.interceptor';
 
 @Controller('posts')
+@UseInterceptors(ExcludeNullInterceptor)
 export default class PostsController {
   constructor(private readonly postsService: PostsService) {}
 

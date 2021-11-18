@@ -5,17 +5,19 @@ import {
   HttpCode,
   Post,
   Req,
-  Res,
+  SerializeOptions,
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { RegisterDto } from './dto/register.dto';
 import { LocalAuthenticationGuard } from './localAuthentication.guard';
 import RequestWithUser from './requestWithUser.interface';
-import { Response } from 'express';
 import JwtAuthenticationGuard from './jwt-authentication.guard';
 
 @Controller('authentication')
+@SerializeOptions({
+  strategy: 'excludeAll',
+})
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
@@ -27,35 +29,27 @@ export class AuthenticationController {
   @HttpCode(200)
   @UseGuards(LocalAuthenticationGuard)
   @Post('log-in')
-  async logIn(
-    @Req() request: RequestWithUser,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async logIn(@Req() request: RequestWithUser) {
     const user = request.user;
     const { name, value, cookieOptions } =
       this.authenticationService.getCookieWithJwtToken(user.id);
-    response.cookie(name, value, cookieOptions);
-    user.password = undefined;
+    request.res.cookie(name, value, cookieOptions);
     return user;
   }
 
   @HttpCode(204)
   @UseGuards(JwtAuthenticationGuard)
   @Post('log-out')
-  async logOut(
-    @Req() request: RequestWithUser,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async logOut(@Req() request: RequestWithUser) {
     const { name, value, cookieOptions } =
       this.authenticationService.getCookieForLogOut();
-    response.cookie(name, value, cookieOptions);
+    request.res.cookie(name, value, cookieOptions);
   }
 
   @UseGuards(JwtAuthenticationGuard)
   @Get()
   authenticate(@Req() request: RequestWithUser) {
     const user = request.user;
-    user.password = undefined;
     return user;
   }
 }
