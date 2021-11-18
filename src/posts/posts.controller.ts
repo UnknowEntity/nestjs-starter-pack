@@ -13,6 +13,7 @@ import PostsService from './posts.service';
 import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
 import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
+import FindOneParams from 'src/utils/findOneParams';
 
 @Controller('posts')
 export default class PostsController {
@@ -24,7 +25,7 @@ export default class PostsController {
   }
 
   @Get(':id')
-  getPostById(@Param('id') id: string) {
+  getPostById(@Param() { id }: FindOneParams) {
     return this.postsService.getPostById(Number(id));
   }
 
@@ -35,13 +36,16 @@ export default class PostsController {
   }
 
   @Put(':id')
-  async replacePost(@Param('id') id: string, @Body() post: UpdatePostDto) {
+  async replacePost(
+    @Param() { id }: FindOneParams,
+    @Body() post: UpdatePostDto,
+  ) {
     return this.postsService.replacePost(Number(id), post);
   }
 
   @HttpCode(204)
   @Delete(':id')
-  async deletePost(@Param('id') id: string) {
+  async deletePost(@Param() { id }: FindOneParams) {
     return this.postsService.deletePost(Number(id));
   }
 }
