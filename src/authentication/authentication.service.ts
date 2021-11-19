@@ -6,7 +6,7 @@ import { PostgresErrorCode } from 'src/database/postgresErrorCodes.enum';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import TokenPayload from './tokenPayload.interface';
-import CookieInterface from './cookie.interface';
+import CookieType from './cookie.type';
 
 @Injectable()
 export class AuthenticationService {
@@ -67,29 +67,75 @@ export class AuthenticationService {
     }
   }
 
-  public getCookieWithJwtToken(userId: number): CookieInterface {
+  public getCookieWithJwtAccessToken(userId: number): CookieType {
     const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
-    return {
-      name: 'Authentication',
-      value: token,
-      cookieOptions: {
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+      expiresIn: `${this.configService.get(
+        'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+      )}s`,
+    });
+    return [
+      'Authentication',
+      token,
+      {
         path: '/',
-        maxAge: this.configService.get<number>('JWT_EXPIRATION_TIME') * 1000,
+        maxAge:
+          this.configService.get<number>('JWT_ACCESS_TOKEN_EXPIRATION_TIME') *
+          1000,
         httpOnly: true,
       },
-    };
+    ];
   }
 
-  public getCookieForLogOut(): CookieInterface {
-    return {
-      name: 'Authentication',
-      value: '',
-      cookieOptions: {
-        path: '/',
-        maxAge: 0,
+  public async getCookieWithJwtRefreshToken(
+    userId: number,
+  ): Promise<CookieType> {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      expiresIn: `${this.configService.get(
+        'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+      )}s`,
+    });
+    const currentHashedRefreshToken = await bcrypt.hash(token, 10);
+    await this.usersService.setCurrentRefreshToken(
+      currentHashedRefreshToken,
+      userId,
+    );
+    return [
+      'Refresh',
+      token,
+      {
+        path: '/authentication/refresh',
+        maxAge:
+          this.configService.get<number>('JWT_REFRESH_TOKEN_EXPIRATION_TIME') *
+          1000,
         httpOnly: true,
       },
-    };
+    ];
+  }
+
+  public getCookieForLogOut(): CookieType[] {
+    return [
+      [
+        'Authentication',
+        '',
+        {
+          path: '/',
+          maxAge: 0,
+          httpOnly: true,
+        },
+      ],
+      [
+        'refresh',
+        '',
+        {
+          path: '/authentication/refresh',
+          maxAge: 0,
+          httpOnly: true,
+        },
+      ],
+    ];
   }
 }

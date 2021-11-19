@@ -12,6 +12,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LocalAuthenticationGuard } from './localAuthentication.guard';
 import RequestWithUser from './requestWithUser.interface';
 import JwtAuthenticationGuard from './jwt-authentication.guard';
+import JwtRefreshGuard from './jwt-refresh.guard';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -27,9 +28,24 @@ export class AuthenticationController {
   @Post('log-in')
   async logIn(@Req() request: RequestWithUser) {
     const user = request.user;
-    const { name, value, cookieOptions } =
-      this.authenticationService.getCookieWithJwtToken(user.id);
-    request.res.cookie(name, value, cookieOptions);
+    const [accessTokenName, accessTokenValue, accessTokenCookieOptions] =
+      this.authenticationService.getCookieWithJwtAccessToken(user.id);
+
+    const [refreshTokenName, refreshTokenValue, refreshTokenCookieOptions] =
+      await this.authenticationService.getCookieWithJwtRefreshToken(user.id);
+
+    request.res.cookie(
+      accessTokenName,
+      accessTokenValue,
+      accessTokenCookieOptions,
+    );
+
+    request.res.cookie(
+      refreshTokenName,
+      refreshTokenValue,
+      refreshTokenCookieOptions,
+    );
+
     return user;
   }
 
@@ -37,9 +53,25 @@ export class AuthenticationController {
   @UseGuards(JwtAuthenticationGuard)
   @Post('log-out')
   async logOut(@Req() request: RequestWithUser) {
-    const { name, value, cookieOptions } =
-      this.authenticationService.getCookieForLogOut();
-    request.res.cookie(name, value, cookieOptions);
+    const cookies = this.authenticationService.getCookieForLogOut();
+
+    const [accessTokenName, accessTokenValue, accessTokenCookieOptions] =
+      cookies[0];
+
+    const [refreshTokenName, refreshTokenValue, refreshTokenCookieOptions] =
+      cookies[1];
+
+    request.res.cookie(
+      accessTokenName,
+      accessTokenValue,
+      accessTokenCookieOptions,
+    );
+
+    request.res.cookie(
+      refreshTokenName,
+      refreshTokenValue,
+      refreshTokenCookieOptions,
+    );
   }
 
   @UseGuards(JwtAuthenticationGuard)
@@ -47,5 +79,19 @@ export class AuthenticationController {
   authenticate(@Req() request: RequestWithUser) {
     const user = request.user;
     return user;
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Get('refresh')
+  refresh(@Req() request: RequestWithUser) {
+    const [accessTokenName, accessTokenValue, accessTokenCookieOptions] =
+      this.authenticationService.getCookieWithJwtAccessToken(request.user.id);
+
+    request.res.cookie(
+      accessTokenName,
+      accessTokenValue,
+      accessTokenCookieOptions,
+    );
+    return request.user;
   }
 }

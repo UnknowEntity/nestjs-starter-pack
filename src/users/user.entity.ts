@@ -1,4 +1,4 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import Post from 'src/posts/post.entity';
 import {
   Column,
@@ -16,23 +16,26 @@ class User {
   public id: number;
 
   @Column({ unique: true })
-  @Expose()
   public email: string;
 
   @Column()
-  @Expose()
   public name: string;
 
   @Column()
   @Exclude()
   public password: string;
 
+  @Column({
+    nullable: true,
+  })
+  @Exclude()
+  public currentHashedRefreshToken?: string;
+
   @OneToOne(() => Address, {
     eager: true,
     cascade: true,
   })
   @JoinColumn()
-  @Expose()
   public address: Address;
 
   @OneToMany(() => Post, (post: Post) => post.author)
