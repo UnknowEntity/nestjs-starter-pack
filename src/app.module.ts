@@ -13,6 +13,8 @@ import { CategoriesModule } from './categories/categories.module';
     AuthenticationModule,
     ConfigModule.forRoot({
       validationSchema: Joi.object({
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
         POSTGRES_HOST: Joi.string().required(),
         POSTGRES_PORT: Joi.number().required(),
         POSTGRES_USER: Joi.string().required(),
