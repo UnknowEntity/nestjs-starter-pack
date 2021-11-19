@@ -5,8 +5,9 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
-  Put,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import UpdatePostDto from './dto/updatePost.dto';
 import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
 import FindOneParams from 'src/utils/findOneParams';
 import { ExcludeNullInterceptor } from 'src/utils/excludeNull.interceptor';
+import RequestWithUser from 'src/authentication/requestWithUser.interface';
 
 @Controller('posts')
 @UseInterceptors(ExcludeNullInterceptor)
@@ -34,16 +36,16 @@ export default class PostsController {
 
   @Post()
   @UseGuards(JwtAuthenticationGuard)
-  async createPost(@Body() post: CreatePostDto) {
-    return this.postsService.createPost(post);
+  async createPost(@Body() post: CreatePostDto, @Req() req: RequestWithUser) {
+    return this.postsService.createPost(post, req.user);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async replacePost(
     @Param() { id }: FindOneParams,
     @Body() post: UpdatePostDto,
   ) {
-    return this.postsService.replacePost(Number(id), post);
+    return this.postsService.updatePost(Number(id), post);
   }
 
   @HttpCode(204)
