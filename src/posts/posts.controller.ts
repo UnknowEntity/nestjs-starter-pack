@@ -1,5 +1,8 @@
 import {
   Body,
+  CacheInterceptor,
+  CacheKey,
+  CacheTTL,
   Controller,
   Delete,
   Get,
@@ -18,12 +21,16 @@ import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard'
 import FindOneParams from 'src/utils/findOneParams';
 import { ExcludeNullInterceptor } from 'src/utils/excludeNull.interceptor';
 import RequestWithUser from 'src/authentication/requestWithUser.interface';
+import { GET_POSTS_CACHE_KEY } from './postsCacheKey.constant';
 
 @Controller('posts')
 @UseInterceptors(ExcludeNullInterceptor)
 export default class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey(GET_POSTS_CACHE_KEY)
+  @CacheTTL(120)
   @Get()
   getAllPosts() {
     return this.postsService.getAllPosts();

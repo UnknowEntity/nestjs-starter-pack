@@ -15,7 +15,7 @@ import PostsService from './posts.service';
         store: redisStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get('REDIS_PORT'),
-        ttl: 120,
+        ttl: 300,
       }),
     }),
     TypeOrmModule.forFeature([Post]),
