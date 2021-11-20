@@ -62,11 +62,18 @@ export default class PostsService {
   }
 
   async deletePost(id: number) {
-    const deleteResponse = await this.postsRepository.delete(id);
+    const deleteResponse = await this.postsRepository.softDelete(id);
     if (deleteResponse.affected) {
       await this.clearCache();
       return;
     }
     throw new PostNotFoundException(id);
+  }
+
+  getAllPostsWithDeleted(): Promise<Post[]> {
+    return this.postsRepository.find({
+      relations: ['posts'],
+      withDeleted: true,
+    });
   }
 }

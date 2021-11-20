@@ -2,6 +2,7 @@ import Category from 'src/categories/category.entity';
 import User from 'src/users/user.entity';
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -26,6 +27,9 @@ class Post {
 
   @ManyToOne(() => User, (author: User) => author.posts)
   public author: User;
+
+  @DeleteDateColumn()
+  public deletedAt: Date;
 }
 
 export default Post;

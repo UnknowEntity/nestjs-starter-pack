@@ -45,4 +45,19 @@ export class CategoriesService {
     await this.categoriesRepository.save(newCategory);
     return newCategory;
   }
+
+  async deleteCategory(id: number) {
+    const deleteResponse = await this.categoriesRepository.softDelete(id);
+    if (deleteResponse.affected) {
+      return;
+    }
+    throw new CategoryNotFoundException(id);
+  }
+
+  getAllCategoriesWithDeleted(): Promise<Category[]> {
+    return this.categoriesRepository.find({
+      relations: ['posts'],
+      withDeleted: true,
+    });
+  }
 }

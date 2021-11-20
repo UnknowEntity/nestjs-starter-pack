@@ -36,6 +36,11 @@ export default class PostsController {
     return this.postsService.getAllPosts();
   }
 
+  @Get('with-deleted')
+  getAllPostsWithDeleted() {
+    return this.postsService.getAllPostsWithDeleted();
+  }
+
   @Get(':id')
   getPostById(@Param() { id }: FindOneParams) {
     return this.postsService.getPostById(Number(id));

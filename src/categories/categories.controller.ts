@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -25,6 +27,11 @@ export default class CategoriesController {
     return this.categoriesService.getAllCategories();
   }
 
+  @Get('with-deleted')
+  getAllCategoriesWithDeleted() {
+    return this.categoriesService.getAllCategoriesWithDeleted();
+  }
+
   @Get(':id')
   getCategoryById(@Param() { id }: FindOneParams) {
     return this.categoriesService.getCategoryById(Number(id));
@@ -42,5 +49,11 @@ export default class CategoriesController {
   @UseGuards(JwtAuthenticationGuard)
   async createPost(@Body() category: CreateCategoryDto) {
     return this.categoriesService.createCategories(category);
+  }
+
+  @HttpCode(204)
+  @Delete(':id')
+  async deleteCategory(@Param() { id }: FindOneParams) {
+    return this.categoriesService.deleteCategory(Number(id));
   }
 }
