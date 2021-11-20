@@ -5,14 +5,21 @@ import * as Joi from '@hapi/joi';
 import { DatabaseModule } from './database/database.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { EmailScheduleModule } from './emailScheduling/emailSchedule.module';
 
 @Module({
   imports: [
     PostsModule,
     CategoriesModule,
+    EmailScheduleModule,
     AuthenticationModule,
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       validationSchema: Joi.object({
+        EMAIL_SERVICE: Joi.string().required(),
+        EMAIL_USER: Joi.string().required(),
+        EMAIL_PASSWORD: Joi.string().required(),
         REDIS_HOST: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
         POSTGRES_HOST: Joi.string().required(),
