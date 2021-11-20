@@ -6,6 +6,7 @@ import User from './user.entity';
 import * as bcrypt from 'bcrypt';
 import LocalFileDto from 'src/localFiles/dto/localFile.dto';
 import LocalFilesService from 'src/localFiles/localFiles.service';
+import UpdateUserDto from './dto/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,10 +16,7 @@ export class UsersService {
   ) {}
 
   async getByEmail(email: string) {
-    const user = this.usersRepository.findOne(
-      { email },
-      { relations: ['address'] },
-    );
+    const user = this.usersRepository.findOne({ email });
     if (user) {
       return user;
     }
@@ -44,10 +42,7 @@ export class UsersService {
   }
 
   async getById(id: number) {
-    const user = await this.usersRepository.findOne(
-      { id },
-      { relations: ['address'] },
-    );
+    const user = await this.usersRepository.findOne({ id });
     if (user) {
       return user;
     }
@@ -75,5 +70,10 @@ export class UsersService {
     await this.usersRepository.update(userId, {
       avatarId: avatar.id,
     });
+  }
+
+  async updateUser(userId: number, updateUserDto: UpdateUserDto) {
+    await this.usersRepository.update(userId, updateUserDto);
+    return this.usersRepository.findOne(userId);
   }
 }

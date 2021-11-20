@@ -22,6 +22,8 @@ import FindOneParams from 'src/utils/findOneParams';
 import { ExcludeNullInterceptor } from 'src/utils/excludeNull.interceptor';
 import RequestWithUser from 'src/authentication/requestWithUser.interface';
 import { GET_POSTS_CACHE_KEY } from './postsCacheKey.constant';
+import RoleGuard from 'src/users/role.guard';
+import Role from 'src/users/role.enum';
 
 @Controller('posts')
 @UseInterceptors(ExcludeNullInterceptor)
@@ -62,6 +64,7 @@ export default class PostsController {
 
   @HttpCode(204)
   @Delete(':id')
+  @UseGuards(RoleGuard(Role.Admin))
   async deletePost(@Param() { id }: FindOneParams) {
     return this.postsService.deletePost(Number(id));
   }

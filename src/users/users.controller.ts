@@ -1,7 +1,9 @@
 import { UsersService } from './users.service';
 import {
   BadRequestException,
+  Body,
   Controller,
+  Patch,
   Post,
   Req,
   UploadedFile,
@@ -12,10 +14,20 @@ import JwtAuthenticationGuard from '../authentication/jwt-authentication.guard';
 import RequestWithUser from '../authentication/requestWithUser.interface';
 import { Express } from 'express';
 import LocalFilesInterceptor from 'src/localFiles/localFiles.interceptor';
+import UpdateUserDto from './dto/updateUser.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Patch()
+  @UseGuards(JwtAuthenticationGuard)
+  updateUser(
+    @Req() request: RequestWithUser,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.updateUser(request.user.id, updateUserDto);
+  }
 
   @Post('avatar')
   @UseGuards(JwtAuthenticationGuard)

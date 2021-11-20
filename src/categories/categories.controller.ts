@@ -10,10 +10,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
+import PermissionGuard from 'src/users/permission.guard';
 import { ExcludeNullInterceptor } from 'src/utils/excludeNull.interceptor';
 import FindOneParams from 'src/utils/findOneParams';
 import { CategoriesService } from './categories.service';
+import CategoriesPermission from './categoriesPermission.enum';
 import CreateCategoryDto from './dto/createCategory.dto';
 import UpdateCategoryDto from './dto/updateCategory.dto';
 
@@ -38,7 +39,7 @@ export default class CategoriesController {
   }
 
   @Patch(':id')
-  async replacePost(
+  async replaceCategory(
     @Param() { id }: FindOneParams,
     @Body() category: UpdateCategoryDto,
   ) {
@@ -46,8 +47,8 @@ export default class CategoriesController {
   }
 
   @Post()
-  @UseGuards(JwtAuthenticationGuard)
-  async createPost(@Body() category: CreateCategoryDto) {
+  @UseGuards(PermissionGuard(CategoriesPermission.CreateCategory))
+  async createCategory(@Body() category: CreateCategoryDto) {
     return this.categoriesService.createCategories(category);
   }
 

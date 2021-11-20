@@ -10,6 +10,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import Address from './address.entity';
+import Permission from './permission.type';
+import Role from './role.enum';
 
 @Entity()
 class User {
@@ -50,6 +52,22 @@ class User {
 
   @Column({ nullable: true })
   public avatarId?: number;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    array: true,
+    default: [Role.User],
+  })
+  public roles: Role[];
+
+  @Column({
+    type: 'enum',
+    enum: Permission,
+    array: true,
+    default: [],
+  })
+  public permissions: Permission[];
 }
 
 export default User;
