@@ -72,7 +72,7 @@ export default class PostsService {
 
   getAllPostsWithDeleted(): Promise<Post[]> {
     return this.postsRepository.find({
-      relations: ['posts'],
+      relations: ['author'],
       withDeleted: true,
     });
   }
