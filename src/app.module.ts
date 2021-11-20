@@ -7,6 +7,8 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailScheduleModule } from './emailScheduling/emailSchedule.module';
+import { UsersModule } from './users/users.module';
+import { LocalFilesModule } from './localFiles/localFiles.module';
 
 @Module({
   imports: [
@@ -14,9 +16,12 @@ import { EmailScheduleModule } from './emailScheduling/emailSchedule.module';
     CategoriesModule,
     EmailScheduleModule,
     AuthenticationModule,
+    UsersModule,
+    LocalFilesModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       validationSchema: Joi.object({
+        UPLOADED_FILES_DESTINATION: Joi.string().required(),
         EMAIL_SERVICE: Joi.string().required(),
         EMAIL_USER: Joi.string().required(),
         EMAIL_PASSWORD: Joi.string().required(),

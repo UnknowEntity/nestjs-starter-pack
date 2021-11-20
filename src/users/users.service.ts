@@ -1,16 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import Address from './address.entity';
 import CreateUserDto from './dto/createUser.dto';
 import User from './user.entity';
 import * as bcrypt from 'bcrypt';
+import LocalFileDto from 'src/localFiles/dto/localFile.dto';
+import LocalFilesService from 'src/localFiles/localFiles.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
-    @InjectRepository(Address) private addressRepository: Repository<Address>,
+    private localFilesService: LocalFilesService,
   ) {}
 
   async getByEmail(email: string) {
@@ -67,5 +68,12 @@ export class UsersService {
     if (isRefreshTokenMatching) {
       return user;
     }
+  }
+
+  async addAvatar(userId: number, fileData: LocalFileDto) {
+    const avatar = await this.localFilesService.saveLocalFileData(fileData);
+    await this.usersRepository.update(userId, {
+      avatarId: avatar.id,
+    });
   }
 }
