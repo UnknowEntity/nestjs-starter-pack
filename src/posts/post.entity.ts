@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import Category from 'src/categories/category.entity';
 import User from 'src/users/user.entity';
 import {
@@ -23,6 +24,7 @@ class Post {
 
   @ManyToMany(() => Category, (category: Category) => category.posts)
   @JoinTable()
+  @ApiHideProperty()
   public categories: Category[];
 
   @ManyToOne(() => User, (author: User) => author.posts)

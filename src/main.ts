@@ -7,12 +7,18 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    exposedHeaders: 'Set-Cookie',
+    credentials: true,
+    methods: 'GET, POST, PATCH, DELETE',
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Nestjs example')
     .setDescription('All API description')
     .setVersion('1.0')
     .addTag('nestjs')
+    .addCookieAuth('Authentication')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import LocalFile from 'src/localFiles/localFile.entity';
 import Post from 'src/posts/post.entity';
@@ -26,12 +27,14 @@ class User {
 
   @Column()
   @Exclude()
+  @ApiHideProperty()
   public password: string;
 
   @Column({
     nullable: true,
   })
   @Exclude()
+  @ApiHideProperty()
   public currentHashedRefreshToken?: string;
 
   @OneToOne(() => Address, {
@@ -41,6 +44,7 @@ class User {
   @JoinColumn()
   public address: Address;
 
+  @ApiHideProperty()
   @OneToMany(() => Post, (post: Post) => post.author)
   public posts: Post[];
 
@@ -48,6 +52,7 @@ class User {
   @OneToOne(() => LocalFile, {
     nullable: true,
   })
+  @ApiHideProperty()
   public avatar?: LocalFile;
 
   @Column({ nullable: true })

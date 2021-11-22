@@ -13,12 +13,24 @@ import { LocalAuthenticationGuard } from './localAuthentication.guard';
 import RequestWithUser from './requestWithUser.interface';
 import JwtAuthenticationGuard from './jwt-authentication.guard';
 import JwtRefreshGuard from './jwt-refresh.guard';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { LogInDto } from './dto/logIn.dto';
+import SetCookieHeader from 'src/utils/setCookie.type';
 
+@ApiTags('authentication')
 @Controller('authentication')
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Post('register')
+  @ApiBadRequestResponse()
   async register(@Body() registrationData: RegisterDto) {
     return this.authenticationService.register(registrationData);
   }
@@ -26,6 +38,9 @@ export class AuthenticationController {
   @HttpCode(200)
   @UseGuards(LocalAuthenticationGuard)
   @Post('log-in')
+  @ApiOkResponse({ headers: SetCookieHeader })
+  @ApiBody({ type: LogInDto })
+  @ApiBadRequestResponse()
   async logIn(@Req() request: RequestWithUser) {
     const user = request.user;
     const [accessTokenName, accessTokenValue, accessTokenCookieOptions] =
@@ -46,12 +61,16 @@ export class AuthenticationController {
       refreshTokenCookieOptions,
     );
 
+    request.res.setHeader('La-la', '1234');
+
     return user;
   }
 
   @HttpCode(204)
   @UseGuards(JwtAuthenticationGuard)
   @Post('log-out')
+  @ApiUnauthorizedResponse()
+  @ApiNotFoundResponse()
   async logOut(@Req() request: RequestWithUser) {
     const cookies = this.authenticationService.getCookieForLogOut();
 
@@ -76,6 +95,8 @@ export class AuthenticationController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Get()
+  @ApiUnauthorizedResponse()
+  @ApiNotFoundResponse()
   authenticate(@Req() request: RequestWithUser) {
     const user = request.user;
     return user;
@@ -83,6 +104,8 @@ export class AuthenticationController {
 
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
   refresh(@Req() request: RequestWithUser) {
     const [accessTokenName, accessTokenValue, accessTokenCookieOptions] =
       this.authenticationService.getCookieWithJwtAccessToken(request.user.id);

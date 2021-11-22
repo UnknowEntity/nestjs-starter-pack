@@ -15,13 +15,26 @@ import RequestWithUser from '../authentication/requestWithUser.interface';
 import { Express } from 'express';
 import LocalFilesInterceptor from 'src/localFiles/localFiles.interceptor';
 import UpdateUserDto from './dto/updateUser.dto';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiConsumes,
+  ApiNotFoundResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import UploadAvatarDto from './dto/uploadAvatar.dto';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Patch()
   @UseGuards(JwtAuthenticationGuard)
+  @ApiNotFoundResponse()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
   updateUser(
     @Req() request: RequestWithUser,
     @Body() updateUserDto: UpdateUserDto,
@@ -31,6 +44,11 @@ export class UsersController {
 
   @Post('avatar')
   @UseGuards(JwtAuthenticationGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadAvatarDto })
+  @ApiNotFoundResponse()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
   @UseInterceptors(
     LocalFilesInterceptor({
       fieldName: 'file',
