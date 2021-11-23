@@ -64,18 +64,17 @@ export default class PostsController {
   @ApiParam({ name: 'id', type: Number })
   @ApiNotFoundResponse()
   async getPostById(@Param() { id }: FindOneParams) {
-    return this.postsService.getPostById(Number(id));
-    // const post = await this.postsService.getPostById(Number(id));
-    // post.author = plainToClass(User, post.author);
-    // return post;
+    const post = await this.postsService.getPostById(Number(id));
+    post.author = plainToClass(User, post.author);
+    return post;
   }
 
   @Post()
-  @ApiCookieAuth()
+  @UseGuards(JwtAuthenticationGuard)
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
-  @UseGuards(JwtAuthenticationGuard)
+  @ApiCookieAuth()
   async createPost(@Body() post: CreatePostDto, @Req() req: RequestWithUser) {
     const newPost = await this.postsService.createPost(post, req.user);
     newPost.author = plainToClass(User, newPost.author);
@@ -98,6 +97,7 @@ export default class PostsController {
   @Delete(':id')
   @UseGuards(RoleGuard(Role.Admin))
   @ApiParam({ name: 'id', type: Number })
+  @ApiCookieAuth()
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
   async deletePost(@Param() { id }: FindOneParams) {

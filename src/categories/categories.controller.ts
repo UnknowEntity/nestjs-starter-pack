@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiParam,
   ApiTags,
@@ -62,6 +63,7 @@ export default class CategoriesController {
   @ApiBadRequestResponse()
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
+  @ApiCookieAuth()
   @UseGuards(PermissionGuard(CategoriesPermission.CreateCategory))
   async createCategory(@Body() category: CreateCategoryDto) {
     return this.categoriesService.createCategories(category);

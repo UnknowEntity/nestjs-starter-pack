@@ -19,6 +19,7 @@ import {
   ApiBadRequestResponse,
   ApiBody,
   ApiConsumes,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -32,6 +33,7 @@ export class UsersController {
 
   @Patch()
   @UseGuards(JwtAuthenticationGuard)
+  @ApiCookieAuth()
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
@@ -44,6 +46,7 @@ export class UsersController {
 
   @Post('avatar')
   @UseGuards(JwtAuthenticationGuard)
+  @ApiCookieAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadAvatarDto })
   @ApiNotFoundResponse()

@@ -4,6 +4,7 @@ import EmailSchedulingService from './emailSchedule.service';
 import EmailScheduleDto from './dto/emailSchedule.dto';
 import {
   ApiBadRequestResponse,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -18,6 +19,7 @@ export default class EmailSchedulingController {
 
   @Post('schedule')
   @UseGuards(JwtAuthenticationGuard)
+  @ApiCookieAuth()
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()

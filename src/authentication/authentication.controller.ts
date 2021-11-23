@@ -16,6 +16,7 @@ import JwtRefreshGuard from './jwt-refresh.guard';
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -61,14 +62,13 @@ export class AuthenticationController {
       refreshTokenCookieOptions,
     );
 
-    request.res.setHeader('La-la', '1234');
-
     return user;
   }
 
   @HttpCode(204)
   @UseGuards(JwtAuthenticationGuard)
   @Post('log-out')
+  @ApiCookieAuth()
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
   async logOut(@Req() request: RequestWithUser) {
@@ -95,6 +95,7 @@ export class AuthenticationController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Get()
+  @ApiCookieAuth()
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
   authenticate(@Req() request: RequestWithUser) {

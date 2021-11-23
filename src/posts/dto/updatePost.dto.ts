@@ -2,18 +2,18 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export default class UpdatePostDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsNotEmpty()
   @IsOptional()
   content: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsNotEmpty()
   @IsOptional()
