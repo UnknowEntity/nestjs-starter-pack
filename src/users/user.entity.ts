@@ -25,15 +25,15 @@ class User {
   @Column()
   public name: string;
 
-  @Column()
   @Exclude()
+  @Column()
   @ApiHideProperty()
   public password: string;
 
+  @Exclude()
   @Column({
     nullable: true,
   })
-  @Exclude()
   @ApiHideProperty()
   public currentHashedRefreshToken?: string;
 
