@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -28,6 +29,7 @@ import UpdateCategoryDto from './dto/updateCategory.dto';
 
 @ApiTags('categories')
 @Controller('categories')
+@UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(ExcludeNullInterceptor)
 export default class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
