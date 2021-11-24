@@ -33,13 +33,11 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
-import User from 'src/users/user.entity';
 
 @ApiTags('posts')
 @Controller('posts')
-@UseInterceptors(ExcludeNullInterceptor)
 @UseInterceptors(ClassSerializerInterceptor)
+@UseInterceptors(ExcludeNullInterceptor)
 export default class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
@@ -47,12 +45,8 @@ export default class PostsController {
   @CacheKey(GET_POSTS_CACHE_KEY)
   @CacheTTL(120)
   @Get()
-  async getAllPosts() {
-    const allPost = await this.postsService.getAllPosts();
-    return allPost.map((value) => {
-      value.author = plainToClass(User, value.author);
-      return value;
-    });
+  getAllPosts() {
+    return this.postsService.getAllPosts();
   }
 
   @Get('with-deleted')
@@ -63,10 +57,8 @@ export default class PostsController {
   @Get(':id')
   @ApiParam({ name: 'id', type: Number })
   @ApiNotFoundResponse()
-  async getPostById(@Param() { id }: FindOneParams) {
-    const post = await this.postsService.getPostById(Number(id));
-    post.author = plainToClass(User, post.author);
-    return post;
+  getPostById(@Param() { id }: FindOneParams) {
+    return this.postsService.getPostById(Number(id));
   }
 
   @Post()
@@ -75,22 +67,15 @@ export default class PostsController {
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
   @ApiCookieAuth()
-  async createPost(@Body() post: CreatePostDto, @Req() req: RequestWithUser) {
-    const newPost = await this.postsService.createPost(post, req.user);
-    newPost.author = plainToClass(User, newPost.author);
-    return newPost;
+  createPost(@Body() post: CreatePostDto, @Req() req: RequestWithUser) {
+    return this.postsService.createPost(post, req.user);
   }
 
   @Patch(':id')
   @ApiParam({ name: 'id', type: Number })
   @ApiNotFoundResponse()
-  async replacePost(
-    @Param() { id }: FindOneParams,
-    @Body() post: UpdatePostDto,
-  ) {
-    const updatedPost = await this.postsService.updatePost(Number(id), post);
-    updatedPost.author = plainToClass(User, updatedPost.author);
-    return updatedPost;
+  replacePost(@Param() { id }: FindOneParams, @Body() post: UpdatePostDto) {
+    return this.postsService.updatePost(Number(id), post);
   }
 
   @HttpCode(204)
@@ -100,7 +85,7 @@ export default class PostsController {
   @ApiCookieAuth()
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
-  async deletePost(@Param() { id }: FindOneParams) {
+  deletePost(@Param() { id }: FindOneParams) {
     return this.postsService.deletePost(Number(id));
   }
 }

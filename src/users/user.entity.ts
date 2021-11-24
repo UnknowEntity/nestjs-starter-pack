@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import LocalFile from 'src/localFiles/localFile.entity';
@@ -45,7 +46,7 @@ class User {
   public address: Address;
 
   @ApiHideProperty()
-  @OneToMany(() => Post, (post: Post) => post.author)
+  @OneToMany((type) => Post, (post: Post) => post.author)
   public posts: Post[];
 
   @JoinColumn({ name: 'avatarId' })
